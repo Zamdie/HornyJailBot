@@ -1,23 +1,17 @@
-import praw;
-import time;
-import os;
-from dotenv import load_dotenv;
-from HornyJailBot import HornyJailBot
-#from github import Github;
+import time; # Imports time lib
+from HornyJailBot import HornyJailBot # Imports HornyJailBot class from HornyJailBot lib
 
-load_dotenv()
+HornyExterminator = HornyJailBot() # I meant "local HornyExterminator = HornyJailBot.new()"
 
-HornyExterminator = HornyJailBot()
-print(HornyExterminator.cache)
-try:
+try: # Try statement so there is a way to detect program termination
 
-    while True:
+    while True: # Infinite loop
 
-        time.sleep(15)
+        time.sleep(15) # Waits 15 seconds
 
-        HornyExterminator.CheckSubmissions()
+        HornyExterminator.CheckSubmissions() # Calls CheckSubmissions method of HornyJailBot object
         
-except:
+finally:
 
-    # This code will be run after manually stopping execution (CTRL + C) because it makes things error
-    HornyExterminator.OnTermination();
+    # This code will be run after manually stopping execution (Ctrl + C) because it makes things error
+    HornyExterminator.OnTermination(); # Calls OnTermination method of HornyJailBot object
