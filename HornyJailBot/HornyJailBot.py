@@ -16,7 +16,7 @@ def GetEnv(envName: str) -> str:
     Returns:
         os.getenv(envName) -> string - Value of the environment variable envName
     """
-    return os.getenv(varName);
+    return os.getenv(envName);
 
 class HornyJailBot():
     
@@ -67,7 +67,7 @@ class HornyJailBot():
         """
         Function __init__:
 
-        Constructor, creates a local Reddit object, which then creates self.subreddits with a list of monitored subreddits and
+        Constructor, creates a sel.reddit object, which then creates self.subreddits with a list of monitored subreddits and
         self.cache to store submission ID's which are written to RepliedPosts.txt on termination
 
         Arguments:
@@ -108,7 +108,7 @@ class HornyJailBot():
         Function CheckSubmissions:
 
         Loops through the subreddits in self.subreddits and then through the submissions, checks if they are NSFW and
-        if they are, bonks it, and appends to self.cache
+        if they are, bonks them, and appends to self.cache
 
         Arguments:
 
@@ -121,17 +121,18 @@ class HornyJailBot():
 
         for subreddit in self.subreddits:
 
-            for submission in subreddit.new(limit = 1000):
+            for submission in subreddit.new(limit = 50):
 
-                if not submission in self.cache:
+                if not submission.id in self.cache:
 
-                    if not submission.over_18:
+                    if submission.over_18:
 
                         print("-------------------------------")
                         print(f"HornyJailBot replied to {submission.title}")
 
-                        self.cache.append(submission.id);
-                        # submission.reply(botReply)
+                        self.cache = self.cache + submission.id + "\n"
+                        
+                        # submission.reply(BotReply)
 
     def CheckInbox(self):
 
@@ -157,10 +158,6 @@ class HornyJailBot():
 
         with open("RepliedPosts.txt","w") as RepliedPosts:
 
-           for id in self.cache:
+            RepliedPosts.write(self.cache);
 
-               RepliedPosts.write(id + "\n");
-
-        self.cache.clear();
-                
-
+        self.cache = None
