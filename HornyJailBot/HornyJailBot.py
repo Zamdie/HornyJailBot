@@ -16,31 +16,41 @@ def GetEnv(envName: str) -> str:
     Returns:
         os.getenv(envName) -> string - Value of the environment variable envName
     """
+    
     return os.getenv(envName);
 
 class HornyJailBot():
     
     """
-    This is HornyJailBot's class, which contain all the functions and properties that can be referenced in the main program.
+    This is HornyJailBot's class, which contain all the functions and properties that can be referenced in the main program
     
+    Arguments:
+
+    void -> void
+
     Returns:
         self -> HornyJailBot - Copy of HornyJailBot's class
 
     Properties:
         self.reddit - Reddit object
         self.subreddits - stores all subreddits
-        self.cache - cache containing the ID's of posts that have been already been replied to, when program is interrupted, they are
+        self.submissionsCache - cache containing the ID's of posts that have been already been replied to, when program is interrupted, they are
         appended to RepliedPosts.txt
+        self.mentionsCache - cache containing the ID's of comments that mention HornyJailBot that have been already been replied to, when program is interrupted, they are
+        appended to Mentions.txt
 
     Methods:
 
-        __init__ - Constructor, creates a local Reddit object, which then creates self.subreddits with a list of monitored subreddits and
-        self.cache to store submission ID's which are written to RepliedPosts.txt on termination
+        __init__ - Constructor, creates a self.reddit object, which then creates self.subreddits with a list of monitored subreddits, self.submissionsCache to store submission ID's
+        which are written to RepliedPosts.txt on termination, and self.mentionsCache to store mentions ID's which are written to Mentions.txt on termination
 
-        CheckSubmissions - Loops through the subreddits in self.subreddits and then through the submissions, checks if they are NSFW and
-        if they are, bonks it, and appends to self.cache
+        CheckSubmissions - Loops through the subreddits in self.subreddits and then through the submissions, checks if they are NSFW and if they are, bonks them, and
+        appends to self.submissionsCache
 
-        OnTermination - Called when program is interrupted, writes things on self.cache to RepliedPosts.txt, and clears it
+        CheckInbox - 
+
+        OnTermination - alled when program is interrupted, writes ID's on self.submissionsCache to RepliedPosts.txt, ID's on self.mentionsCache to Mentions.txt and clears
+        them
 
         ⣿⣿⣿⣿⣯⣿⣿⠄⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠈⣿⣿⣿⣿⣿⣿⣆⠄
         ⢻⣿⣿⣿⣾⣿⢿⣢⣞⣿⣿⣿⣿⣷⣶⣿⣯⣟⣿⢿⡇⢃⢻⣿⣿⣿⣿⣿⢿⡄
@@ -67,8 +77,9 @@ class HornyJailBot():
         """
         Function __init__:
 
-        Constructor, creates a sel.reddit object, which then creates self.subreddits with a list of monitored subreddits and
-        self.cache to store submission ID's which are written to RepliedPosts.txt on termination
+        Constructor, creates a self.reddit object, which then creates self.subreddits with a list of monitored subreddits, self.submissionsCache
+        to store submission ID's which are written to RepliedPosts.txt on termination, and self.mentionsCache to store mentions ID's which
+        are written to Mentions.txt on termination
 
         Arguments:
 
@@ -79,28 +90,34 @@ class HornyJailBot():
             void -> void
         """
 
-        self.reddit = praw.Reddit(
+        self.reddit = praw.Reddit( # Gets Reddit
             
-            user_agent = GetEnv("BotUserName"),
-            client_id = GetEnv("ScriptID"),
-            client_secret = GetEnv("ScriptSecret"),
-            username = GetEnv("BotUsername"),
-            password = GetEnv("BotPassword")
+            user_agent = GetEnv("BotName"), # Get env variable BotName
+            client_id = GetEnv("ScriptID"), # Get env variable ScriptID
+            client_secret = GetEnv("ScriptSecret"), # Get env variable ScriptSecret
+            username = GetEnv("BotUsername"), # Get env variable BotUsername
+            password = GetEnv("BotPassword") # Get env variable BotPassword
             
         );
 
-        self.subreddits = [
+        self.subreddits = [ # List of subreddits
             
-            self.reddit.subreddit("ZeroTwo"),
-            self.reddit.subreddit("ZeroTwoHentai")
+            self.reddit.subreddit("ZeroTwo"), # r/ZeroTwo
+            self.reddit.subreddit("ZeroTwoHentai") # r/ZeroTwoHentai
+            # self.reddit.subreddit("DarlingInTheFranxx") # (banned) r/DarlingInTheFranxx
 
         ];
 
-        self.cache = ""
+        self.submissionsCache = ""; # Cache for submissions
+        self.mentionsCache = ""; # Cache for mentions
 
-        with open("RepliedPosts.txt","r") as RepliedPosts:
+        with open("RepliedPosts.txt","r") as RepliedPosts: # Continues as RepliedPosts being the text file
 
-            self.cache = RepliedPosts.read();
+            self.submissionsCache = RepliedPosts.read(); # Sets submissionsCache to the contents of RepliedPosts
+
+        with open("Mentions.txt","r") as Mentions: # Continues as Mentions being the text file
+
+            self.mentionsCache = Mentions.read(); # Sets mentionsCache to the contents of Mentions
 
     def CheckSubmissions(self):
 
@@ -108,7 +125,7 @@ class HornyJailBot():
         Function CheckSubmissions:
 
         Loops through the subreddits in self.subreddits and then through the submissions, checks if they are NSFW and
-        if they are, bonks them, and appends to self.cache
+        if they are, bonks them, and appends to self.submissionsCache
 
         Arguments:
 
@@ -119,33 +136,54 @@ class HornyJailBot():
             void -> void
         """
 
-        for subreddit in self.subreddits:
+        for subreddit in self.subreddits: # Loops through the subreddits
 
-            for submission in subreddit.new(limit = 50):
+            for submission in subreddit.new(limit = 50): # Loops through 50 posts in the new category of the subreddit
 
-                if not submission.id in self.cache:
+                if not submission.id in self.submissionsCache: # If the submission ID is not in the cache
 
-                    if submission.over_18:
+                    if submission.over_18: # If submission is NSFW
 
-                        print("-------------------------------")
-                        print(f"HornyJailBot replied to {submission.title}")
+                        print("-------------------------------");
+                        print(f"HornyJailBot replied to {submission.title}"); # Log stuff
 
-                        self.cache = self.cache + submission.id + "\n"
+                        submission.reply(self.BotReply); # Reply
+                        self.cache += submission.id + "\n"; # Append submission ID to cache
                         
-                        # submission.reply(BotReply)
+                        
 
     def CheckInbox(self):
+        
+        """
+        Function CheckInbox:
 
-        for mention in self.reddit.inbox.mentions:
+        Loops through all mentions, checks if they have been already mentioned and if not, bonks, and appends to self.mentionsCache
 
-            pass
+        Arguments:
+
+            self -> HornyJailBot - HornyJailBot object
+
+        Returns:
+
+            void -> void
+        """
+        
+        for mention in self.reddit.inbox.mentions(): # Loops through the mentions
+
+            if not mention.id in self.mentionsCache: # If comment's ID is not in the cache
+
+                print("-------------------------------")
+                print(f"HornyJailBot replied to mention: {mention.body} by {mention.author}"); # Log stuff
+
+                mention.reply(self.BotReply) # Reply
+                self.mentionsCache += mention.id + "\n"; # Append comment ID to cache
 
     def OnTermination(self):
 
         """
         Function OnTermination:
 
-        Called when program is interrupted, writes things on self.cache to RepliedPosts.txt, and clears it
+        Called when program is interrupted, writes ID's on self.submissionsCache to RepliedPosts.txt, ID's on self.mentionsCache to Mentions.txt and clears them
 
         Arguments:
             
@@ -155,9 +193,14 @@ class HornyJailBot():
 
             void -> void
         """
+        
+        with open("RepliedPosts.txt","w") as RepliedPosts: # Continues as RepliedPosts being the text file
 
-        with open("RepliedPosts.txt","w") as RepliedPosts:
+            RepliedPosts.write(self.submissionsCache); # Write submissionsCache to RepliedPosts
 
-            RepliedPosts.write(self.cache);
+        with open("Mentions.txt","w") as Mentions: # Continues as Mentions being the text file
 
-        self.cache = None
+            Mentions.write(self.mentionsCache); # Write submissionsCache to Mentions
+
+        self.submissionsCache = None; # Clear submissionsCache
+        self.mentionsCache = None; # Clear mentionsCache
