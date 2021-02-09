@@ -7,7 +7,7 @@ try: # Try statement so there is a way to detect program termination
 
     while True: # Infinite loop     
     
-        #HornyExterminator.CheckSubmissions(); # Calls CheckSubmissions method of HornyJailBot object
+        HornyExterminator.CheckSubmissions(); # Calls CheckSubmissions method of HornyJailBot object
 
         HornyExterminator.CheckInbox(); # Calls CheckInbox method of HornyJailBot object
         
