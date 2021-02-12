@@ -11,10 +11,10 @@ try: # Try statement so there is a way to detect program termination
 
         HornyExterminator.CheckInbox(); # Calls CheckInbox method of HornyJailBot object
         
-        sleep(2); # Waits 15 seconds
+        sleep(15); # Waits 15 seconds
         
 except:
 
     # This code will be run after manually stopping execution (Ctrl + C) because it makes things error
-
+    
     HornyExterminator.OnTermination(); # Calls OnTermination method of HornyJailBot object
