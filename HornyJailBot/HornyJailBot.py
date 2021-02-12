@@ -105,7 +105,7 @@ class HornyJailBot():
             self.reddit.subreddit("ZeroTwo"), # r/ZeroTwo
             self.reddit.subreddit("ZeroTwoHentai") # r/ZeroTwoHentai
             # self.reddit.subreddit("DarlingInTheFranxx") # (banned) r/DarlingInTheFranxx
-
+            # self.reddit.subreddit("HornyJailBot") # Debug
         ];
 
         self.submissionsCache = ""; # Cache for submissions
@@ -138,7 +138,7 @@ class HornyJailBot():
 
         for subreddit in self.subreddits: # Loops through the subreddits
 
-            for submission in subreddit.new(limit = 50): # Loops through 50 posts in the new category of the subreddit
+            for submission in subreddit.new(limit = 25): # Loops through 50 posts in the new category of the subreddit
 
                 if not submission.id in self.submissionsCache: # If the submission ID is not in the cache
 
@@ -148,16 +148,14 @@ class HornyJailBot():
                         print(f"HornyJailBot replied to {submission.title}"); # Log stuff
 
                         submission.reply(self.BotReply); # Reply
-                        self.cache += submission.id + "\n"; # Append submission ID to cache
-                        
-                        
+                        self.submissionsCache += submission.id + "\n"; # Append submission ID to cache
 
     def CheckInbox(self):
         
         """
         Function CheckInbox:
 
-        Loops through all mentions, checks if they have been already mentioned and if not, bonks, and appends to self.mentionsCache
+        Loops through all mentions, checks if they have been already mentioned and if not, bonks the parent comment (if it is under the submission, bonks the submission), and appends to self.mentionsCache
 
         Arguments:
 
@@ -175,7 +173,7 @@ class HornyJailBot():
                 print("-------------------------------")
                 print(f"HornyJailBot replied to mention: {mention.body} by {mention.author}"); # Log stuff
 
-                mention.reply(self.BotReply) # Reply
+                mention.parent().reply(self.BotReply) # Reply to parent comment
                 self.mentionsCache += mention.id + "\n"; # Append comment ID to cache
 
     def OnTermination(self):
