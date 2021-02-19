@@ -103,8 +103,9 @@ class HornyJailBot():
         self.subreddits = [ # List of subreddits
             
             self.reddit.subreddit("ZeroTwo"), # r/ZeroTwo
-            self.reddit.subreddit("ZeroTwoHentai") # r/ZeroTwoHentai
+            # self.reddit.subreddit("ZeroTwoHentai"), #  (banned) r/ZeroTwoHentai
             # self.reddit.subreddit("DarlingInTheFranxx") # (banned) r/DarlingInTheFranxx
+            self.reddit.subreddit("Horimiya"),
             # self.reddit.subreddit("HornyJailBot") # Debug
         ];
 
