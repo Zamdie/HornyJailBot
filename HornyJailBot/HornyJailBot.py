@@ -137,19 +137,27 @@ class HornyJailBot():
             void -> void
         """
 
-        for subreddit in self.subreddits: # Loops through the subreddits
+        try: # Try for errors such as the post not existing anymore
 
-            for submission in subreddit.new(limit = 25): # Loops through 50 posts in the new category of the subreddit
+            for subreddit in self.subreddits: # Loops through the subreddits
 
-                if not submission.id in self.submissionsCache: # If the submission ID is not in the cache
+                for submission in subreddit.new(limit = 25): # Loops through 50 posts in the new category of the subreddit
 
-                    if submission.over_18: # If submission is NSFW
+                    if not submission.id in self.submissionsCache: # If the submission ID is not in the cache
 
-                        print("-------------------------------");
-                        print(f"HornyJailBot replied to {submission.title}"); # Log stuff
+                        if submission.over_18: # If submission is NSFW
 
-                        submission.reply(self.BotReply); # Reply
-                        self.submissionsCache += submission.id + "\n"; # Append submission ID to cache
+                            print("-------------------------------");
+                            print(f"HornyJailBot replied to {submission.title}"); # Log stuff
+
+                            submission.reply(self.BotReply); # Reply
+                            self.submissionsCache += submission.id + "\n"; # Append submission ID to cache
+
+        except Exception as exception:
+            
+            print(exception) # Log exception
+            self.submissionsCache += submission.id + "\n"; # Append submission ID to cache or else it's gonna error every iteration
+
 
     def CheckInbox(self):
         
@@ -167,15 +175,24 @@ class HornyJailBot():
             void -> void
         """
         
-        for mention in self.reddit.inbox.mentions(): # Loops through the mentions
+        try: # Try for errors such as the parent submission/comment not existing anymore
 
-            if not mention.id in self.mentionsCache: # If comment's ID is not in the cache
+            for mention in self.reddit.inbox.mentions(): # Loops through the mentions
 
-                print("-------------------------------")
-                print(f"HornyJailBot replied to mention: {mention.body} by {mention.author}"); # Log stuff
+                if not mention.id in self.mentionsCache: # If comment's ID is not in the cache
 
-                mention.parent().reply(self.BotReply) # Reply to parent comment
-                self.mentionsCache += mention.id + "\n"; # Append comment ID to cache
+                    print("-------------------------------")
+                    print(f"HornyJailBot replied to mention: {mention.body} by {mention.author}"); # Log stuff
+
+                    mention.parent().reply(self.BotReply) # Reply to parent comment
+                    self.mentionsCache += mention.id + "\n"; # Append comment ID to cache
+
+        except Exception as exception:
+            
+            print(exception) # Log exception
+            self.mentionsCache += mention.id + "\n"; # Append mention ID to cache or else it's gonna error every iteration
+
+
 
     def OnTermination(self):
 
